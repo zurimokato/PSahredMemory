@@ -25,16 +25,16 @@ void llenarVector(Especie *esp,int tam);
 void imprimirEspecies(Especie *esp, int tam);
 void actualizar(Especie *esp,int desde, int hasta);
 int main(){
-	int n=0,k=0,tam=0,i=0;
+	int numHijos=0,numIteraciones=0,tam=0,i=0;
 	int shmid=0;
 	signal(SIGUSR1,manejadorSenial);
 	printf("Escriba el numero de iteraciones:\n");
-	scanf("%d",&k);
+	scanf("%d",&numIteraciones);
 	printf("Escriba el numero de procesos:\n");
-	scanf("%d",&n);
+	scanf("%d",&numHijos);
 	printf("Escriba el tamaño del vector de especies:\n");
 	scanf("%d",&tam);
-	pid_t padre=getpid(),hijos[n];
+	pid_t padre=getpid(),hijos[numHijos];
 	//vecEs=(Especie *)calloc(tam,sizeof(Especie));
 	Especie *vecEs;
 	shmid=shmget(IPC_PRIVATE,sizeof(Especie)*tam,IPC_CREAT|S_IRUSR|S_IWUSR);
@@ -42,9 +42,9 @@ int main(){
 	
 
 	llenarVector(vecEs,tam);
-	/*printf("primer barrido antes de actualizar\n");
+	printf("primer barrido antes de actualizar\n");
 	imprimirEspecies(vecEs, tam);
-	aleatoreo(vecEs,tam);
+	/*aleatoreo(vecEs,tam);
 	actualizar(vecEs,tam);
 	burbuja(vecEs,tam);
 	aleatoreo(vecEs, tam);
@@ -52,13 +52,13 @@ int main(){
 	imprimirEspecies(vecEs, tam);
 	*/
 	//Creando gerarquia
-
-	for(i=0;i<n;i++){
+	printf("\n");
+	for(i=0;i<numHijos;i++){
 		if(!(hijos[i]=fork())){
 			break;
 		}
 	}
-	for (int x = 0; x< k; x++){
+	for (int x = 0; x< numIteraciones; x++){
 		if(padre==getpid()){
 			usleep(1500);
 			kill(hijos[i-1],SIGUSR1);
@@ -66,17 +66,17 @@ int main(){
 			//printf("antes\n");
 			//imprimirEspecies(vecEs,tam);
 			burbuja(vecEs,tam);
-			printf("los dies mejores:\n");
+			printf("los dies mejores de la generacion %d:\n",x);
 			imprimirEspecies(vecEs,10);
 			aleatoreo(vecEs,tam);
 		}else{
 			pause();
-			int t=tam/n;
-			int j=i*t;
-			int k=(i*t)+t;
-			for (j; j < k; j++){
+			int itePerHijos=tam/numHijos;
+			int desde=i*itePerHijos;
+			int hasta=(i*itePerHijos)+itePerHijos;
+			for (desde; desde < hasta; desde++){
 				//aleatoreo(vecEs, j,k);
-				actualizar(vecEs,j,k);
+				actualizar(vecEs,desde,hasta);
 			}
 			
 			if(i==0){
@@ -92,7 +92,7 @@ int main(){
 
 	shmdt(vecEs);
 	if(padre==getpid()){
-		for(int o=0;o<n;o++){
+		for(int o=0;o<numHijos;o++){
 			wait(NULL);
 		}
 		shmctl(shmid,IPC_RMID,0);
@@ -149,7 +149,7 @@ void llenarVector(Especie *esp,int tam){
 		Especie *es=(Especie*)malloc(sizeof(Especie));
 		es->f1=rand()%20;
 		es->f2=rand()%20;
-		es->fit=0;//fitnes(es->f1,es->f2);
+		es->fit=fitnes(es->f1,es->f2);
 		esp[i].f1=es->f1;
 		esp[i].f2=es->f2;
 		esp[i].fit=es->fit;
