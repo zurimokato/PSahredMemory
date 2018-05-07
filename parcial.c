@@ -14,13 +14,13 @@
 typedef struct f{
 	float f1;
 	float f2;
+	int id;
 	float fit;
 }Especie;
 
 float fitnes(float f1, float f2);
 void burbuja(Especie *esp,int tam);
 void manejadorSenial(int sig);
-void aleatoreo(Especie *esp, int tam);
 void llenarVector(Especie *esp,int tam);
 void imprimirEspecies(Especie *esp, int tam);
 void actualizar(Especie *esp,int desde, int hasta);
@@ -43,6 +43,7 @@ int main(){
 
 	llenarVector(vecEs,tam);
 	printf("primer barrido antes de actualizar\n");
+	//burbuja(vecEs,tam);
 	imprimirEspecies(vecEs, tam);
 	/*aleatoreo(vecEs,tam);
 	actualizar(vecEs,tam);
@@ -68,7 +69,7 @@ int main(){
 			burbuja(vecEs,tam);
 			printf("los dies mejores de la generacion %d:\n",x);
 			imprimirEspecies(vecEs,10);
-			aleatoreo(vecEs,tam);
+			
 		}else{
 			pause();
 			int itePerHijos=tam/numHijos;
@@ -134,36 +135,31 @@ void manejadorSenial(int sig){
 
 }
 
-void aleatoreo(Especie *esp, int tam){
-
-	for(int i=0;i<tam;i++){
-		esp[i].f1=rand()%20;
-		esp[i].f2=rand()%10;
-	}
-
-}
 
 void llenarVector(Especie *esp,int tam){
 	
 	for (int i = 0; i < tam; i++){
 		Especie *es=(Especie*)malloc(sizeof(Especie));
-		es->f1=rand()%20;
-		es->f2=rand()%20;
+		es->f1=rand()%20 +1;
+		es->f2=rand()%15 + 1;
 		es->fit=fitnes(es->f1,es->f2);
 		esp[i].f1=es->f1;
 		esp[i].f2=es->f2;
 		esp[i].fit=es->fit;
+		
 	}
 
 }
 
 void imprimirEspecies(Especie *esp, int tam){
 	for (int k = 0; k < tam; k++){
-		printf("[%f]\n",esp[k].fit);
+		printf(" [%f]\n",esp[k].fit);
 	}
 }
 void actualizar(Especie *esp,int desde, int hasta){
 	for(int i=desde;i<hasta;i++){
+		esp[i].f1=rand()%20+1;
+		esp[i].f2=rand()%10+1;
 		esp[i].fit=fitnes(esp[i].f1,esp[i].f2);
 	}
 }
